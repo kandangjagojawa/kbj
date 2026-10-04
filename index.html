@@ -255,8 +255,8 @@
 
     <div class="header-container">
         <div class="title-wrapper">
-            <h1>PAUGERAN KBJ (KONGRES BAHASA JAWA)</h1>
-            <div class="subtitle-jawa">ꦥꦲꦸꦒꦼꦂꦫꦤ꧀꧇ꦏ꧈ꦧ꧈ꦗ꧈</div>
+            <h1>PAUGERAN KBJ (KONGRES BASA JAWA)</h1>
+            <div class="subtitle-jawa">ꦠꦠꦠꦸꦭꦶꦱ꧀ꦏ꧀ꦧ꧀ꦗ꧀</div>
         </div>
         <div class="btn-group-header">
             <button onclick="scrollToParamasastra()" class="btn-external-link btn-paramasastra">
@@ -738,13 +738,16 @@
                 let kataKata = line.split(/\s+/);
                 let kataJawa = kataKata.map(kata => transliterasiKata(kata));
                 
-                // MENGGUNAKAN UNTUK SCRIPTO CONTINUA (TANPA SPASI ANTAR KATA)
+                // UNTUK SCRIPTO CONTINUA (TANPA SPASI ANTAR KATA)
                 let lineJoined = kataJawa.join(''); 
                 
                 lineJoined = lineJoined.replace(/꧀ꦊ/g, '꧀ꦭꦼ');
-                lineJoined = lineJoined.replace(/꧀([ꦄꦆꦈꦌꦎ]|[ꦏꦢꦒꦗ]꦳)/g, '꧀\u200C$1');
+                
+                // ATURAN 2 KBJ: Aksara Rekan BISA DIPASANGI dan MENJADI PASANGAN
+                // Hanya Aksara Swara (A, I, U, E, O) yang diberi ZWNJ (\u200C) setelah pangkon
+                lineJoined = lineJoined.replace(/꧀([ꦄꦆꦈꦌꦎ])/g, '꧀\u200C$1');
 
-                // Pencegahan Tumpuk Tiga (Pasangan Ganda)
+                // Pencegahan Tumpuk Tiga (Pasangan Ganda Antarkata)
                 lineJoined = lineJoined.replace(/([ꦀ-꧟])꧀([ꦀ-꧟])(꦳?)꧀([ꦀ-꧟])/g, function(match, p1, p2, p3, p4) {
                     if (p2 === 'ꦥ' || p2 === 'ꦱ') return match; 
                     return p1 + '꧀\u200C' + p2 + p3 + '꧀' + p4; 
@@ -962,6 +965,7 @@
                     continue;
                 }
 
+                // ATURAN KBJ: Hanya Aksara Swara yang diberi ZWNJ (\u200C)
                 let nonPasangan = isSwara; 
                 if (nonPasangan && res.endsWith('꧀')) res += '\u200C';
 
