@@ -510,14 +510,11 @@
 
             let stem = dasar;
             let prefixAppended = "";
-            let altPrefixAppended = ""; // Untuk opsi alternatif (Rules 6, 7, 8)
+            let altPrefixAppended = "";
 
-            // ATURAN 7 & 8 KBJ: Ater-ater Anuswara Luluh vs Tidak Luluh
             if (['N', 'm', 'n', 'ny', 'ng', 'pa'].includes(ater)) {
-                // KONSONAN TIDAK LULUH (d, dh, b, g, j) -> ATURAN 8 KBJ: Wajib Tambah 'ha'
                 if (['d','j'].includes(f) || dasar.startsWith('dh')) {
                     if (f === 'j') {
-                        // jaluk -> hanjaluk (hanyaluk / hanyjaluk)
                         prefixAppended = 'han';
                         altPrefixAppended = 'hany';
                         stem = dasar;
@@ -532,7 +529,6 @@
                     prefixAppended = 'hang';
                     stem = dasar;
                 }
-                // KONSONAN LULUH & VOKAL (p, w, t, th, c, s, k, vokal) -> ATURAN 7 KBJ: Boleh polos / pakai 'ha'
                 else if (['p','w'].includes(f)) {
                     stem = 'm' + dasar.slice(1);
                     altPrefixAppended = 'ha';
@@ -555,7 +551,7 @@
                 }
                 else if (isVowelStart) {
                     stem = 'ng' + dasar;
-                    altPrefixAppended = 'hang'; // e.g. ngisi (hangngisi)
+                    altPrefixAppended = 'hang';
                 }
                 else if (['l','r','y'].includes(f)) {
                     stem = 'ng' + dasar;
@@ -704,10 +700,8 @@
 
             if (altPrefixAppended !== "") {
                 if (altPrefixAppended === 'hang') {
-                    // khusus vokal: ngisi (hangngisi)
                     resultLatinAlt = bentakAkhiran(stem, 'hang');
                 } else if (altPrefixAppended === 'hany' && f === 'j') {
-                    // jaluk: hanjaluk (hanyaluk)
                     resultLatinAlt = bentakAkhiran('y' + dasar.slice(1), 'han');
                 } else {
                     resultLatinAlt = bentakAkhiran(stem, altPrefixAppended);
@@ -723,7 +717,7 @@
             document.getElementById('outParamJawa').innerText = transliterasiKalimat(fullLatinDisplay);
         }
 
-        /* --- ENGINE TRANSLITERASI UTAMA (TATA TULIS PAUGERAN KBJ) --- */
+        /* --- ENGINE TRANSLITERASI UTAMA --- */
         function prosesTransliterasi() {
             let teksInput = document.getElementById('inputLatin').value;
             let hasil = transliterasiKalimat(teksInput);
@@ -733,7 +727,7 @@
         function transliterasiKalimat(teks) {
             let teksDiolah = teks.replace(/e'/g, 'é').replace(/E'/g, 'É');
 
-            // ATURAN 8 KBJ: Anuswara + Konsonan Tidak Luluh (d, dh, b, g, j) WAJIB ditambah 'ha' di depan
+            // ATURAN 8 KBJ: Anuswara + Konsonan Tidak Luluh (d, dh, b, g, j) WAJIB ditambah 'ha'
             teksDiolah = teksDiolah.replace(/\b(mb|ndh|nd|nth|ngg|nj)/gim, function(match) {
                 let isUpper = match[0] === match[0].toUpperCase();
                 return (isUpper ? 'H' : 'h') + match.toLowerCase();
@@ -749,7 +743,6 @@
                 lineJoined = lineJoined.replace(/꧀ꦊ/g, '꧀ꦭꦼ');
                 lineJoined = lineJoined.replace(/꧀([ꦄꦆꦈꦌꦎ]|[ꦏꦢꦒꦗ]꦳)/g, '꧀\u200C$1');
 
-                // Pencegahan Pasangan Ganda Antarkata (Tumpuk Tiga)
                 lineJoined = lineJoined.replace(/([ꦀ-꧟])꧀([ꦀ-꧟])(꦳?)꧀([ꦀ-꧟])/g, function(match, p1, p2, p3, p4) {
                     if (p2 === 'ꦥ' || p2 === 'ꦱ') return match; 
                     return p1 + '꧀\u200C' + p2 + p3 + '꧀' + p4; 
@@ -763,9 +756,8 @@
         function transliterasiKata(rawLatin) {
             if (!rawLatin) return "";
 
-            // ATURAN 6 KBJ: Di tengah kata 'n' mati + 'c'/'j' tetap n dipangku (ꦤ꧀ꦕ, ꦤ꧀ꦗ),
-            // dan diberi alternatif di dalam kurung (ꦚ꧀ꦕ, ꦚ꧀ꦗ).
-            if (/[a-zA-Z]/i.test(rawLatin) && /(nc|nj)/i.test(rawLatin) && !/^\(/https://html.spec.whatwg.org/multipage/.test(rawLatin)) {
+            // ATURAN 6 KBJ: Di tengah kata 'n' mati + 'c'/'j'
+            if (/[a-zA-Z]/i.test(rawLatin) && /(nc|nj)/i.test(rawLatin) && !/^\(/.test(rawLatin)) {
                 let mainRes = transliterasiSingleKata(rawLatin);
                 let altLatin = rawLatin.replace(/nc/gi, 'nyc').replace(/nj/gi, 'nyj');
                 let altRes = transliterasiSingleKata(altLatin);
@@ -781,7 +773,6 @@
         function transliterasiSingleKata(rawLatin) {
             if (!rawLatin) return "";
 
-            // Singkatan (contoh: S.H.)
             if (/^([a-zA-Z]\.)+$/.test(rawLatin)) {
                 let abbr = "";
                 for (let j = 0; j < rawLatin.length; j += 2) {
@@ -812,12 +803,6 @@
 
             let latinProcessed = rawLatin;
 
-            // KETERANGAN PAUGERAN KBJ (ATURAN 3, 4, 5):
-            // - ATURAN 3: Suku kata pertama -er diperbolehkan (pepet-layar), tidak otomatis ganti cakra keret.
-            // - ATURAN 4: Suku kata pertama 3 suku kata vokal terbuka pepet diperbolehkan (tidak dipaksa nagara/segara).
-            // - ATURAN 5: Tidak ada taling tarung palsu untuk anuswara mati tengah kata.
-
-            // Penanganan Panambang (Akhiran)
             latinProcessed = latinProcessed.replace(/([a-zA-ZéèêÉÈÊ]+)-([a-zA-ZéèêÉÈÊ]+)/g, function(match, root, suffix) {
                 if (root.toLowerCase() === suffix.toLowerCase()) return root + suffix;
 
@@ -960,14 +945,12 @@
                     }
                 }
 
-                // ATURAN 1 KBJ: Aksara Murda mati / ditutup suku kata -> Otomatis diubah jadi aksara biasa (Nglegena)
                 if (v === "" && !isSwara) {
                     if (c === 'ng' && !isFirstAksara && canTakeSandhangan) res += 'ꦁ'; 
                     else if (c === 'r' && !isFirstAksara && canTakeSandhangan) res += 'ꦂ'; 
                     else if (c === 'h' && !isFirstAksara && canTakeSandhangan) res += 'ꦃ'; 
                     else if (c !== "") {
-                        // Murda mati tidak boleh dipangku / diberi pangkon -> ubah isMurda jadi false
-                        let useMurda = isMurda && false; // Otomatis bukan murda jika mati
+                        let useMurda = isMurda && false;
                         let base = useMurda ? AKSARA_MURDA[c] : KAMUS_AKSARA[c];
                         res += base + '꧀'; 
                     }
@@ -977,7 +960,6 @@
                     continue;
                 }
 
-                // ATURAN 2 KBJ: Aksara Rekan bisa dipasangi & menjadi pasangan -> lepas batasan \u200C untuk rekan
                 let nonPasangan = isSwara; 
                 if (nonPasangan && res.endsWith('꧀')) res += '\u200C';
 
@@ -986,7 +968,6 @@
                 } else if (c === 'r' && (v === 'e' || v === 'ê') && medial === "") {
                     res += 'ꦉ'; 
                 } else {
-                    // Jika aksara ini dipasangi (res diakhiri pangkon ꧀), Murda tidak boleh jadi pasangan -> pakai KAMUS_AKSARA
                     let isAttachedAsPasangan = res.endsWith('꧀');
                     let useMurda = isMurda && !isAttachedAsPasangan;
 
