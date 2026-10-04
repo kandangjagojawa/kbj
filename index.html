@@ -727,10 +727,10 @@
         function transliterasiKalimat(teks) {
             let teksDiolah = teks.replace(/e'/g, 'é').replace(/E'/g, 'É');
 
-            // ATURAN 8 KBJ: Anuswara + Konsonan Tidak Luluh (d, dh, b, g, j) WAJIB ditambah 'ha'
+            // ATURAN 8 KBJ: Anuswara + Konsonan Tidak Luluh (d, dh, b, g, j, th) WAJIB ditambah 'ha' di depan
             teksDiolah = teksDiolah.replace(/\b(mb|ndh|nd|nth|ngg|nj)/gim, function(match) {
                 let isUpper = match[0] === match[0].toUpperCase();
-                return (isUpper ? 'H' : 'h') + match.toLowerCase();
+                return (isUpper ? 'Ha' : 'ha') + match.toLowerCase();
             });
 
             let baris = teksDiolah.split('\n');
