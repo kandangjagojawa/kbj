@@ -255,7 +255,7 @@
 
     <div class="header-container">
         <div class="title-wrapper">
-            <h1>PAUGERAN KBJ (KONGRES BASA JAWA)</h1>
+            <h1>PAUGERAN KBJ (KONGRES BAHASA JAWA)</h1>
             <div class="subtitle-jawa">ꦥꦲꦸꦒꦼꦂꦫꦤ꧀꧇ꦏ꧈ꦧ꧈ꦗ꧈</div>
         </div>
         <div class="btn-group-header">
@@ -275,11 +275,10 @@
                 <ul>
                     <li><strong>Vokal:</strong> Gunakan <code>é</code>/<code>è</code> (taling), atau ketik <code>e'</code> menggunakan kibor fisik untuk taling, dan <code>e</code> (pepet).</li>
                     <li><strong>Panambang (akhiran):</strong> Ketik tanda hubung <code>-</code> sebelum akhiran (contoh: omah-e), untuk memastikan kata dasar diakhiri suku kata terbuka atau tertutup.</li>
-                    <li><strong>Aksara Dha (Aturan Khusus KBJ):</strong> Huruf latin <code>dh</code> menggunakan Da Mahaprana <code>ꦣ</code> (U+A9A3). Jika menjadi pasangan (pasangan dha), otomatis menggunakan Pasangan Da Murda <code>꧀ꦝ</code>.</li>
-                    <li><strong>Aksara Rekan (Aturan KBJ):</strong> Ketik <code>kh</code> (ꦏ꦳), <code>dz</code> (ꦢ꦳), <code>gh</code> (ꦒ꦳), <code>z</code> (ꦗ꦳), <code>f/v</code> (ꦥ꦳). Aksara Rekan bisa dipasangi dan menjadi pasangan.</li>
+                    <li><strong>Aksara Rekan:</strong> Ketik <code>kh</code> (ꦏ꦳), <code>dz</code> (ꦢ꦳), <code>gh</code> (ꦒ꦳), <code>z</code> (ꦗ꦳), <code>f/v</code> (ꦥ꦳).</li>
                     <li><strong>Aksara Swara:</strong> Ketik huruf vokal kapital (<code>A, I, U, E, O</code>).</li>
-                    <li><strong>Aksara Murda (Aturan KBJ):</strong> Ketik konsonan Kapital (<code>N, K, T, S, P, G, B, J, NY</code>). Murda tidak bisa mati/dipangku/dipasangi; jika mati otomatis berubah ke aksara biasa.</li>
-                    <li><strong>Pepet Layar (-er):</strong> Kata berawalan <code>-er</code> (seperti <em>perlu</em>) diperbolehkan menggunakan pepet-layar dan tidak dipaksa jadi cakra keret.</li>
+                    <li><strong>Aksara Murda:</strong> Ketik konsonan Kapital (<code>N, K, T, S, P, G, B, J, NY</code>).</li>
+                    <li><strong>Pepet Layar (-er):</strong> Kata berawalan <code>-er</code> (seperti <em>perlu</em>) diperbolehkan menggunakan pepet-layar.</li>
                     <li>Untuk memaksa aksara r, ng, dan h agar bisa diberi cakra/pengkal, tambahkan <code>x</code>. Contoh: <code>rxya</code> (ꦫꦾ), <code>ngxra</code> (ꦔꦿ), <code>hxre</code> (ꦲꦽ).</li>
                 </ul>
             </div>
@@ -393,8 +392,6 @@
     </div>
 
     <script>
-        // ATURAN KHUSUS KBJ:
-        // 'dh' Nglegena menggunakan Da Mahaprana U+A9A3 (ꦣ)
         const KAMUS_AKSARA = {
             'h':'ꦲ', 'n':'ꦤ', 'c':'ꦕ', 'r':'ꦫ', 'k':'ꦏ',
             'd':'ꦢ', 't':'ꦠ', 's':'ꦱ', 'w':'ꦮ', 'l':'ꦭ',
@@ -405,7 +402,6 @@
             'kx':'ꦏ', 'rx':'ꦫ', 'hx':'ꦲ', 'ngx':'ꦔ'
         };
 
-        // Pasangan 'dh' MUTLAK menggunakan Pasangan Da Murda U+A99D (꧀ꦝ)
         const AKSARA_MURDA = {
             'n':'ꦟ', 'k':'ꦑ', 't':'ꦡ', 's':'ꦯ', 'p':'ꦦ',
             'g':'ꦓ', 'b':'ꦨ', 'c':'ꦖ', 'ny':'ꦘ', 'j':'ꦙ', 'dh':'ꦝ'
@@ -747,7 +743,6 @@
                 
                 lineJoined = lineJoined.replace(/꧀ꦊ/g, '꧀ꦭꦼ');
                 
-                // ATURAN 2 KBJ: Aksara Rekan BISA DIPASANGI dan MENJADI PASANGAN
                 // Hanya Aksara Swara (A, I, U, E, O) yang diberi ZWNJ (\u200C) setelah pangkon
                 lineJoined = lineJoined.replace(/꧀([ꦄꦆꦈꦌꦎ])/g, '꧀\u200C$1');
 
@@ -964,7 +959,7 @@
                     else if (c === 'h' && !isFirstAksara && canTakeSandhangan) res += 'ꦃ'; 
                     else if (c !== "") {
                         let useMurda = isMurda && false;
-                        // Khusus KBJ: Bila 'dh' dalam posisi dipangku
+                        // Bila 'dh' dalam posisi dipangku
                         let base = (c === 'dh' && res.endsWith('꧀')) ? AKSARA_MURDA['dh'] : (useMurda ? AKSARA_MURDA[c] : KAMUS_AKSARA[c]);
                         res += base + '꧀'; 
                     }
@@ -985,7 +980,7 @@
                     let isAttachedAsPasangan = res.endsWith('꧀');
                     let useMurda = isMurda && !isAttachedAsPasangan;
 
-                    // Khusus KBJ: Bila 'dh' menjadi Pasangan di bawah aksara lain (diakhiri pangkon ꧀), gunakan Pasangan Da Murda (ꦝ)
+                    // Bila 'dh' menjadi Pasangan di bawah aksara lain (diakhiri pangkon ꧀), gunakan Pasangan Da Murda (ꦝ)
                     let base = isSwara ? SWARA_MAP[c] : ((c === 'dh' && isAttachedAsPasangan) ? AKSARA_MURDA['dh'] : (useMurda ? AKSARA_MURDA[c] : KAMUS_AKSARA[c]));
                     res += base;
 
