@@ -255,8 +255,8 @@
 
     <div class="header-container">
         <div class="title-wrapper">
-            <h1>PAUGERAN KBJ (KONGRES BAHASA JAWA)</h1>
-            <div class="subtitle-jawa">ꦥꦲꦸꦒꦼꦂꦫꦤ꧀꧇ꦏ꧈ꦧ꧈ꦗ꧈</div>
+            <h1>PAUGERAN KBJ (KONGRES BASA JAWA)</h1>
+            <div class="subtitle-jawa">ꦠꦠꦠꦸꦭꦶꦱ꧀ꦏ꧀ꦧ꧀ꦗ꧀</div>
         </div>
         <div class="btn-group-header">
             <button onclick="scrollToParamasastra()" class="btn-external-link btn-paramasastra">
@@ -275,6 +275,7 @@
                 <ul>
                     <li><strong>Vokal:</strong> Gunakan <code>é</code>/<code>è</code> (taling), atau ketik <code>e'</code> menggunakan kibor fisik untuk taling, dan <code>e</code> (pepet).</li>
                     <li><strong>Panambang (akhiran):</strong> Ketik tanda hubung <code>-</code> sebelum akhiran (contoh: omah-e), untuk memastikan kata dasar diakhiri suku kata terbuka atau tertutup.</li>
+                    <li><strong>Aksara Dha (Aturan Khusus KBJ):</strong> Huruf latin <code>dh</code> menggunakan Da Mahaprana <code>ꦣ</code> (U+A9A3). Jika menjadi pasangan (pasangan dha), otomatis menggunakan Pasangan Da Murda <code>꧀ꦝ</code>.</li>
                     <li><strong>Aksara Rekan (Aturan KBJ):</strong> Ketik <code>kh</code> (ꦏ꦳), <code>dz</code> (ꦢ꦳), <code>gh</code> (ꦒ꦳), <code>z</code> (ꦗ꦳), <code>f/v</code> (ꦥ꦳). Aksara Rekan bisa dipasangi dan menjadi pasangan.</li>
                     <li><strong>Aksara Swara:</strong> Ketik huruf vokal kapital (<code>A, I, U, E, O</code>).</li>
                     <li><strong>Aksara Murda (Aturan KBJ):</strong> Ketik konsonan Kapital (<code>N, K, T, S, P, G, B, J, NY</code>). Murda tidak bisa mati/dipangku/dipasangi; jika mati otomatis berubah ke aksara biasa.</li>
@@ -392,16 +393,19 @@
     </div>
 
     <script>
+        // ATURAN KHUSUS KBJ:
+        // 'dh' Nglegena menggunakan Da Mahaprana U+A9A3 (ꦣ)
         const KAMUS_AKSARA = {
             'h':'ꦲ', 'n':'ꦤ', 'c':'ꦕ', 'r':'ꦫ', 'k':'ꦏ',
             'd':'ꦢ', 't':'ꦠ', 's':'ꦱ', 'w':'ꦮ', 'l':'ꦭ',
-            'p':'ꦥ', 'dh':'ꦝ', 'j':'ꦗ', 'y':'ꦪ', 'ny':'ꦚ',
+            'p':'ꦥ', 'dh':'\uA9A3', 'j':'ꦗ', 'y':'ꦪ', 'ny':'ꦚ',
             'm':'ꦩ', 'g':'ꦒ', 'b':'ꦧ', 'th':'ꦛ', 'ng':'ꦔ', 'nx':'ꦔ',
             'f':'ꦥ꦳', 'v':'ꦮ꦳', 'z':'ꦗ꦳',
             'kh':'ꦏ꦳', 'dz':'ꦢ꦳', 'gh':'ꦒ꦳',
             'kx':'ꦏ', 'rx':'ꦫ', 'hx':'ꦲ', 'ngx':'ꦔ'
         };
 
+        // Pasangan 'dh' MUTLAK menggunakan Pasangan Da Murda U+A99D (꧀ꦝ)
         const AKSARA_MURDA = {
             'n':'ꦟ', 'k':'ꦑ', 't':'ꦡ', 's':'ꦯ', 'p':'ꦦ',
             'g':'ꦓ', 'b':'ꦨ', 'c':'ꦖ', 'ny':'ꦘ', 'j':'ꦙ', 'dh':'ꦝ'
@@ -753,6 +757,10 @@
                     return p1 + '꧀\u200C' + p2 + p3 + '꧀' + p4; 
                 });
 
+                // ATURAN MUTLAK PAUGERAN KBJ UNTUK PASANGAN DH:
+                // Memastikan bahwa SETIAP Pasangan Da Mahaprana (꧀ꦣ) DIPAKSA berubah menjadi Pasangan Da Murda (꧀ꦝ)
+                lineJoined = lineJoined.replace(/꧀ꦣ/g, '꧀ꦝ');
+
                 return lineJoined;
             });
             return hasilBaris.join('\n');
@@ -956,7 +964,8 @@
                     else if (c === 'h' && !isFirstAksara && canTakeSandhangan) res += 'ꦃ'; 
                     else if (c !== "") {
                         let useMurda = isMurda && false;
-                        let base = useMurda ? AKSARA_MURDA[c] : KAMUS_AKSARA[c];
+                        // Khusus KBJ: Bila 'dh' dalam posisi dipangku
+                        let base = (c === 'dh' && res.endsWith('꧀')) ? AKSARA_MURDA['dh'] : (useMurda ? AKSARA_MURDA[c] : KAMUS_AKSARA[c]);
                         res += base + '꧀'; 
                     }
                     
@@ -965,7 +974,6 @@
                     continue;
                 }
 
-                // ATURAN KBJ: Hanya Aksara Swara yang diberi ZWNJ (\u200C)
                 let nonPasangan = isSwara; 
                 if (nonPasangan && res.endsWith('꧀')) res += '\u200C';
 
@@ -977,7 +985,8 @@
                     let isAttachedAsPasangan = res.endsWith('꧀');
                     let useMurda = isMurda && !isAttachedAsPasangan;
 
-                    let base = isSwara ? SWARA_MAP[c] : (useMurda ? AKSARA_MURDA[c] : KAMUS_AKSARA[c]);
+                    // Khusus KBJ: Bila 'dh' menjadi Pasangan di bawah aksara lain (diakhiri pangkon ꧀), gunakan Pasangan Da Murda (ꦝ)
+                    let base = isSwara ? SWARA_MAP[c] : ((c === 'dh' && isAttachedAsPasangan) ? AKSARA_MURDA['dh'] : (useMurda ? AKSARA_MURDA[c] : KAMUS_AKSARA[c]));
                     res += base;
 
                     if (medial === 'y') res += 'ꦾ';
