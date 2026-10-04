@@ -738,11 +738,13 @@
                 let kataKata = line.split(/\s+/);
                 let kataJawa = kataKata.map(kata => transliterasiKata(kata));
                 
-                let lineJoined = kataJawa.join(' '); 
+                // MENGGUNAKAN UNTUK SCRIPTO CONTINUA (TANPA SPASI ANTAR KATA)
+                let lineJoined = kataJawa.join(''); 
                 
                 lineJoined = lineJoined.replace(/꧀ꦊ/g, '꧀ꦭꦼ');
                 lineJoined = lineJoined.replace(/꧀([ꦄꦆꦈꦌꦎ]|[ꦏꦢꦒꦗ]꦳)/g, '꧀\u200C$1');
 
+                // Pencegahan Tumpuk Tiga (Pasangan Ganda)
                 lineJoined = lineJoined.replace(/([ꦀ-꧟])꧀([ꦀ-꧟])(꦳?)꧀([ꦀ-꧟])/g, function(match, p1, p2, p3, p4) {
                     if (p2 === 'ꦥ' || p2 === 'ꦱ') return match; 
                     return p1 + '꧀\u200C' + p2 + p3 + '꧀' + p4; 
